@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "246570372115",
+    "firebase_url": "https://worklisting-61803.firebaseio.com",
+    "project_id": "worklisting-61803",
+    "storage_bucket": "worklisting-61803.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246570372115:android:df545b534ebad5a78ec3e6",
+        "android_client_info": {
+          "package_name": "com.example.WorkListing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246570372115-jliqho53dofv9jltp0p7gkafhftecr5s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.WorkListing",
+            "certificate_hash": "1b94ecbe580b26b1c0e2957ab4a96cfa1828400c"
+          }
+        },
+        {
+          "client_id": "246570372115-ite6vpdgehd4hdo6egpiaijkfrmf2ibq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz5xyMN3bgQmhRN9guIkTdPjQF_51iZr4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "246570372115-ite6vpdgehd4hdo6egpiaijkfrmf2ibq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
