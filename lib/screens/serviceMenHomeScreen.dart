@@ -22,7 +22,7 @@ class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
                     child: Text('Logout'),
                     onPressed: () async {
                       await _auth.signOut();
-                      Navigator.of(context).pushReplacementNamed('/logInScreen');
+                      // Navigator.of(context).pushReplacementNamed('/logInScreen');
                     },
                   ),
         ),

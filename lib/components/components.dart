@@ -11,10 +11,10 @@ ClipPath backgroundClip(double heightPiece, double widthPiece) {
 }
 
 TextField customTextField(
-    BuildContext context, String hintText, TextInputType inputType,Function onChanged) {
+    BuildContext context, String hintText, TextInputType inputType,Function onChanged,Widget prefixIcon) {
   return TextField(onChanged: onChanged,
     keyboardType: inputType,
-    decoration: InputDecoration(
+    decoration: InputDecoration(prefixIcon: prefixIcon,
       border: InputBorder.none,
       hintText: hintText,
       filled: true,

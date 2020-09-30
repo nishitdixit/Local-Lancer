@@ -6,32 +6,29 @@ import 'package:image_picker/image_picker.dart';
 
 PickedFile imageFile;
  
-class BottomSheetWidget extends StatefulWidget {
-  @override
-  _BottomSheetWidgetState createState() => _BottomSheetWidgetState();
-}
-
-class _BottomSheetWidgetState extends State<BottomSheetWidget> {
+class BottomSheetWidget extends StatelessWidget {
+  Function selectImage;
+  BottomSheetWidget(this.selectImage);
   var _picker = ImagePicker();
-  void takePhotoByCamera() async {
-    PickedFile image = await _picker.getImage(source: ImageSource.camera);
-
-    setState(() {
-      imageFile = image;
-    });
+  void takePhotoByCamera() async {await _picker.getImage(source: ImageSource.camera).then(selectImage());
+    // widget.selectImage();
+    // setState(() {
+    //   imageFile = image;
+    // });
   }
 
   void takePhotoByGallery() async {
-    PickedFile image = await _picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      imageFile = image;
-    });
+    await _picker.getImage(source: ImageSource.gallery).then(selectImage());
+    // PickedFile image = await _picker.getImage(source: ImageSource.gallery);
+    // setState(() {
+    //   imageFile = image;
+    // });
   }
 
   void removePhoto() {
-    setState(() {
-      imageFile = null;
-    });
+    // setState(() {
+    //   imageFile = null;
+    // });
   }
 
   @override
