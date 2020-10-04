@@ -20,7 +20,7 @@ class PhoneAuth {
         : null;
   }
 
-  Stream<LocalUser> get user {
+  Stream<LocalUser> get currentUserFromAuthMappedIntoLocalUser {
     return _auth
         .authStateChanges()
         .map((firebaseUser) => _userFromLocalUser(firebaseUser));
@@ -39,19 +39,13 @@ class PhoneAuth {
       await _auth.verifyPhoneNumber(
           phoneNumber: this.phoneNo, // PHONE NUMBER TO SEND OTP
           codeAutoRetrievalTimeout: (String verId) {
-            //Starts the phone number verification process for the given phone number.
-            //Either sends an SMS with a 6 digit code to the phone number specified, or sign's the user in and [verificationCompleted] is called.
             this.verificationId = verId;
           },
           codeSent:
               smsOTPSent, // WHEN CODE SENT THEN WE OPEN DIALOG TO ENTER OTP.
           timeout: const Duration(seconds: 40),
-          verificationCompleted: (AuthCredential phoneAuthCredential) async {
-            print(phoneAuthCredential);
-            Navigator.of(context).pop();
-
-            await _auth.signInWithCredential(phoneAuthCredential);
-          },
+          verificationCompleted: ((AuthCredential phoneAuthCredential) =>
+              verificationCompelete(phoneAuthCredential, context)),
           verificationFailed: (FirebaseAuthException exceptio) {
             print('${exceptio.message}');
           });
@@ -101,6 +95,14 @@ class PhoneAuth {
             ],
           );
         });
+  }
+
+  verificationCompelete(
+      AuthCredential phoneAuthCredential, BuildContext context) async {
+    print(phoneAuthCredential);
+    Navigator.of(context).pop();
+
+    await _auth.signInWithCredential(phoneAuthCredential);
   }
 
   signIn(context) async {

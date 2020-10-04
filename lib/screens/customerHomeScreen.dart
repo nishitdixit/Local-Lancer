@@ -2,12 +2,12 @@ import 'package:WorkListing/components/components.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class ServiceMenHomeScreen extends StatefulWidget {
+class CustomerHomeScreen extends StatefulWidget {
   @override
-  _ServiceMenHomeScreenState createState() => _ServiceMenHomeScreenState();
+  _CustomerHomeScreenState createState() => _CustomerHomeScreenState();
 }
 
-class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
+class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
@@ -18,9 +18,9 @@ class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
         children: [
           backgroundClip(heightPiece, widthPiece),
           Center(
-            child: Column(
+            child: Column(mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('This is Service Men Home Screen'),
+                Text('This is Customer Home Screen'),
                 RaisedButton(
                   child: Text('Logout'),
                   onPressed: () async {

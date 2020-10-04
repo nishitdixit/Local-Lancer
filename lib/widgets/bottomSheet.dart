@@ -5,20 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 PickedFile imageFile;
- 
+
 class BottomSheetWidget extends StatelessWidget {
-  Function selectImage;
+  Function(PickedFile) selectImage;
   BottomSheetWidget(this.selectImage);
   var _picker = ImagePicker();
-  void takePhotoByCamera() async {await _picker.getImage(source: ImageSource.camera).then(selectImage());
+  void takePhotoByCamera(BuildContext context) async {
+    Navigator.pop(context);
+    await _picker.getImage(source: ImageSource.camera).then(selectImage);
     // widget.selectImage();
     // setState(() {
     //   imageFile = image;
     // });
   }
 
-  void takePhotoByGallery() async {
-    await _picker.getImage(source: ImageSource.gallery).then(selectImage());
+  void takePhotoByGallery(BuildContext context) async {
+    Navigator.pop(context);
+    await _picker.getImage(source: ImageSource.gallery).then(selectImage);
     // PickedFile image = await _picker.getImage(source: ImageSource.gallery);
     // setState(() {
     //   imageFile = image;
@@ -33,28 +36,35 @@ class BottomSheetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(decoration: BoxDecoration(
-          color: Colors.amber,
+    var heightPiece = MediaQuery.of(context).size.height / 10;
+    var widthPiece = MediaQuery.of(context).size.width / 10;
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(50), topRight: Radius.circular(50))),
-      height: 250.0,
-      width: 250.0,
+              topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+      height: heightPiece * 2.5,
+      width: widthPiece * 10,
       // margin: EdgeInsets.only(left: 30.0, top: 25.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
             "Profile photo",
-            style: TextStyle(
-              fontSize: 20.0,
-            ),
+            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
           ),
           Container(
-            margin: EdgeInsets.only(right: 20.0, top: 20.0),
+            margin: EdgeInsets.only(
+                right: widthPiece * 2,
+                top: heightPiece * 0.2,
+                left: widthPiece),
             child: Row(
               children: <Widget>[
                 FlatButton.icon(
                   icon: Icon(Icons.camera),
-                  onPressed: takePhotoByCamera,
+                  onPressed: () {
+                    takePhotoByCamera(context);
+                  },
                   label: Text("Camera"),
                 ),
                 Container(
@@ -62,14 +72,19 @@ class BottomSheetWidget extends StatelessWidget {
                 ),
                 FlatButton.icon(
                   icon: Icon(Icons.image),
-                  onPressed: takePhotoByGallery,
+                  onPressed: () {
+                    takePhotoByGallery(context);
+                  },
                   label: Text("Gallery"),
                 ),
               ],
             ),
           ),
           Container(
-            margin: EdgeInsets.only(right: 40.0, top: 10.0),
+            margin: EdgeInsets.only(
+                right: widthPiece * 2,
+                top: heightPiece * 0.2,
+                left: widthPiece),
             child: Row(
               children: <Widget>[
                 FlatButton.icon(
