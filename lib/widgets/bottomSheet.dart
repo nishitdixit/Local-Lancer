@@ -7,9 +7,9 @@ import 'package:image_picker/image_picker.dart';
 PickedFile imageFile;
 
 class BottomSheetWidget extends StatelessWidget {
-  Function(PickedFile) selectImage;
+ final Function(PickedFile) selectImage;
   BottomSheetWidget(this.selectImage);
-  var _picker = ImagePicker();
+  final _picker = ImagePicker();
   void takePhotoByCamera(BuildContext context) async {
     Navigator.pop(context);
     await _picker.getImage(source: ImageSource.camera).then(selectImage);
@@ -45,7 +45,6 @@ class BottomSheetWidget extends StatelessWidget {
               topLeft: Radius.circular(25), topRight: Radius.circular(25))),
       height: heightPiece * 2.5,
       width: widthPiece * 10,
-      // margin: EdgeInsets.only(left: 30.0, top: 25.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[

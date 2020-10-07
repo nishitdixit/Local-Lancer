@@ -1,5 +1,4 @@
 
-import 'package:WorkListing/components/components.dart';
 import 'package:WorkListing/screens/customerRegistration.dart';
 import 'package:WorkListing/screens/serviceMenRegistration.dart';
 import 'package:flutter/material.dart';

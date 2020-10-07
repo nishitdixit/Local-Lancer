@@ -41,7 +41,8 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
               SizedBox(height: 20),
               customTextFieldForAadhar(widthPiece),
               SizedBox(height: 20),
-              customButtonToUpdateCustomerDocInDatabase(widthPiece, user),
+              customButtonToUpdateCustomerDocInDatabase(
+                  widthPiece, user, context),
             ],
           ),
         ),
@@ -110,7 +111,7 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
   }
 
   Padding customButtonToUpdateCustomerDocInDatabase(
-      double widthPiece, LocalUser user) {
+      double widthPiece, LocalUser user, BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: widthPiece),
       child: RaisedButton(
@@ -144,6 +145,7 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
               phoneNo: user.phoneNo,
               address: _address,
               gender: _gender);
+          Navigator.of(context).pop();
         },
         child: Text(
           'Register',

@@ -2,7 +2,6 @@ import 'package:WorkListing/models/localUser.dart';
 import 'package:WorkListing/screens/logInScreen.dart';
 import 'package:WorkListing/screens/serviceMenHomeScreen.dart';
 import 'package:WorkListing/services/PhoneAuth.dart';
-import 'package:WorkListing/services/firestoreService.dart';
 import 'package:WorkListing/services/userManagement.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

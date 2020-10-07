@@ -54,7 +54,8 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
               SizedBox(height: 20),
               fieldForGender(widthPiece),
               SizedBox(height: 20),
-              buttonToUploadPicInStorageAndRegisterServiceMen(widthPiece, user),
+              buttonToUploadPicInStorageAndRegisterServiceMen(
+                  widthPiece, user, context),
             ],
           ),
         ),
@@ -62,50 +63,52 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
     );
   }
 
-  Padding buttonToUploadPicInStorageAndRegisterServiceMen(double widthPiece, LocalUser user)  {
+  Padding buttonToUploadPicInStorageAndRegisterServiceMen(
+      double widthPiece, LocalUser user, BuildContext context) {
     return Padding(
-              padding: EdgeInsets.symmetric(horizontal: widthPiece),
-              child: RaisedButton(
-                padding: const EdgeInsets.only(bottom: 6.0, top: 8.0),
-                color: Colors.white,
-                onPressed: () async {
-                  String fileName = basename(_profilePic.path);
-                  firebase_storage.StorageReference firebaseStorageRef =
-                      firebase_storage.FirebaseStorage.instance
-                          .ref()
-                          .child('${user.uid}/$fileName');
-                  var profilePicUrl;
-                  try {
-                    profilePicUrl = await firebaseStorageRef
-                        .putFile(File(_profilePic.path))
-                        .onComplete
-                        .then((value) async => await value.ref
-                            .getDownloadURL()
-                            .then((urlInstance) => urlInstance.toString()));
-                  } catch (e) {
-                    print(e);
-                  }
-                  await FirestoreService(uid: user.uid).updateServiceMenDoc(
-                      uid: user.uid,
-                      name: _name,
-                      phoneNo: user.phoneNo,
-                      address: _address,
-                      gender: _gender,
-                      experience: _experience,
-                      profilePicUrl: profilePicUrl,
-                      age: _age,
-                      skill: _skill,
-                      aadharNo: _aadharNo);
-                },
-                child: Text(
-                  'Register',
-                  style: TextStyle(color: Color(0xffF57921)),
-                ),
-                shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.white)),
-              ),
-            );
+      padding: EdgeInsets.symmetric(horizontal: widthPiece),
+      child: RaisedButton(
+        padding: const EdgeInsets.only(bottom: 6.0, top: 8.0),
+        color: Colors.white,
+        onPressed: () async {
+          String fileName = basename(_profilePic.path);
+          firebase_storage.StorageReference firebaseStorageRef =
+              firebase_storage.FirebaseStorage.instance
+                  .ref()
+                  .child('${user.uid}/$fileName');
+          var profilePicUrl;
+          try {
+            profilePicUrl = await firebaseStorageRef
+                .putFile(File(_profilePic.path))
+                .onComplete
+                .then((value) async => await value.ref
+                    .getDownloadURL()
+                    .then((urlInstance) => urlInstance.toString()));
+          } catch (e) {
+            print(e);
+          }
+          await FirestoreService(uid: user.uid).updateServiceMenDoc(
+              uid: user.uid,
+              name: _name,
+              phoneNo: user.phoneNo,
+              address: _address,
+              gender: _gender,
+              experience: _experience,
+              profilePicUrl: profilePicUrl,
+              age: _age,
+              skill: _skill,
+              aadharNo: _aadharNo);
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Register',
+          style: TextStyle(color: Color(0xffF57921)),
+        ),
+        shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(18.0),
+            side: BorderSide(color: Colors.white)),
+      ),
+    );
   }
 
   Padding fieldForGender(double widthPiece) {
