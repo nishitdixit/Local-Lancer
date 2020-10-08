@@ -138,7 +138,7 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
           //     .ref()
           //     .child('${user.uid}/$fileName')
           //     .getDownloadURL();
-          await FirestoreService(uid: user.uid).updateCustomerDoc(
+          await FirestoreService(uid: user.uid,phoneNo: user.phoneNo).updateCustomerDoc(
               uid: user.uid,
               name: _name,
               profilePicUrl: profilePicUrl,

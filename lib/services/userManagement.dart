@@ -21,17 +21,15 @@ class _UserManagementState extends State<UserManagement> {
     if (currentAuthenticatedUser == null) {
       return LogInScreen();
     } else {
-      return StreamProvider.value(
-        value: FirestoreService(uid: currentAuthenticatedUser.uid)
-            .currentUserDocFromDBMappedIntoLocalUserData,
-        catchError: (_, __) => null,
-        child: RoleBasedRoute(),
-      );
+      return RoleBasedRoute(currentAuthenticatedUser);
+      
     }
   }
 }
 
 class RoleBasedRoute extends StatefulWidget {
+  final LocalUser currentAuthenticatedUser;
+  RoleBasedRoute(this.currentAuthenticatedUser);
   @override
   _RoleBasedRouteState createState() => _RoleBasedRouteState();
 }
@@ -39,8 +37,15 @@ class RoleBasedRoute extends StatefulWidget {
 class _RoleBasedRouteState extends State<RoleBasedRoute> {
   @override
   Widget build(BuildContext context) {
-    final LocalUserData localUserData = Provider.of<LocalUserData>(context);
-    if (localUserData == null) {
+   return StreamBuilder(
+      stream: FirestoreService(uid: widget.currentAuthenticatedUser.uid,phoneNo: widget.currentAuthenticatedUser.phoneNo)
+            .currentUserDocFromDBMappedIntoLocalUserData,
+    
+      builder: (BuildContext context, AsyncSnapshot userSnapshot){
+        if(userSnapshot.connectionState==ConnectionState.waiting){ return Scaffold(body: Center(child: CircularProgressIndicator(),),);}
+      if(userSnapshot.connectionState==ConnectionState.active){
+        LocalUserData localUserData=userSnapshot.data;
+        if (localUserData == null) {
       return AskRegistrationScreen();
     } else {
       print(localUserData.name);
@@ -50,8 +55,12 @@ class _RoleBasedRouteState extends State<RoleBasedRoute> {
         return CustomerHomeScreen();
       } else {
         print('servicemen else block');
-        return ServiceMenHomeScreen();
+        return ServiceMenHomeScreen(localUserData:localUserData);
       }
-    }
+    }}return Scaffold(body: Center(child: CircularProgressIndicator(),),);
+      },
+    );
+    // final LocalUserData localUserData = Provider.of<LocalUserData>(context);
+   
   }
 }

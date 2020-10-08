@@ -1,7 +1,9 @@
 import 'package:WorkListing/models/localUser.dart';
+import 'package:WorkListing/models/userLocation.dart';
 import 'package:WorkListing/screens/logInScreen.dart';
 import 'package:WorkListing/screens/serviceMenHomeScreen.dart';
 import 'package:WorkListing/services/PhoneAuth.dart';
+import 'package:WorkListing/services/location.dart';
 import 'package:WorkListing/services/userManagement.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +23,10 @@ class MyApp extends StatelessWidget {
     //   value: PhoneAuth().user,
     return MultiProvider(
       providers: [
-        StreamProvider<LocalUser>.value(value: PhoneAuth().currentUserFromAuthMappedIntoLocalUser),
+        StreamProvider<LocalUser>.value(
+            value: PhoneAuth().currentUserFromAuthMappedIntoLocalUser),
+        // StreamProvider<UserLocation>.value(
+            // value: LocationService().locationStream),
         // StreamProvider<LocalUserData>.value(value: FirestoreService().userData),
       ],
       child: MaterialApp(

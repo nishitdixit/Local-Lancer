@@ -3,8 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
   final String uid;
+  final phoneNo;
 
-  FirestoreService({this.uid});
+  FirestoreService({this.uid, this.phoneNo});
   // collection reference
   final CollectionReference userDataCollectionRefrence =
       FirebaseFirestore.instance.collection('users');
@@ -18,7 +19,7 @@ class FirestoreService {
     String address,
     String gender,
   }) async {
-    return await userDataCollectionRefrence.doc(uid).set({
+    return await userDataCollectionRefrence.doc(phoneNo).set({
       'uid': uid,
       'name': name,
       'phoneNo': phoneNo,
@@ -42,7 +43,7 @@ class FirestoreService {
     String gender,
     String skill,
   }) async {
-    return await userDataCollectionRefrence.doc(uid).set({
+    return await userDataCollectionRefrence.doc(phoneNo).set({
       'uid': uid,
       'name': name,
       'phoneNo': phoneNo,
@@ -60,6 +61,7 @@ class FirestoreService {
   // LocalUserData from snapshot
   LocalUserData _localUserDataFromSnapshot(DocumentSnapshot snapshot) {
     if (snapshot != null) {
+      // print(snapshot.data());
       if (snapshot.data()['role'] == 'service men') {
         return LocalUserData(
             uid: uid,
@@ -69,6 +71,7 @@ class FirestoreService {
             aadharNo: snapshot.data()['aadharNo'],
             gender: snapshot.data()['gender'],
             phoneNo: snapshot.data()['phoneNo'],
+            profilePicUrl: snapshot.data()['profilePicUrl'],
             experience: snapshot.data()['experience'],
             skill: snapshot.data()['skill'],
             role: snapshot.data()['role']);
@@ -77,6 +80,7 @@ class FirestoreService {
             uid: uid,
             name: snapshot.data()['name'],
             address: snapshot.data()['address'],
+            profilePicUrl: snapshot.data()['profilePicUrl'],
             gender: snapshot.data()['gender'],
             phoneNo: snapshot.data()['phoneNo'],
             role: snapshot.data()['role']);
@@ -88,7 +92,7 @@ class FirestoreService {
   // get currentUserDataFromDB stream
   Stream<LocalUserData> get currentUserDocFromDBMappedIntoLocalUserData {
     return userDataCollectionRefrence
-        .doc(uid)
+        .doc(phoneNo)
         .snapshots()
         .map((snapshot) => _localUserDataFromSnapshot(snapshot));
   }

@@ -87,7 +87,7 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
           } catch (e) {
             print(e);
           }
-          await FirestoreService(uid: user.uid).updateServiceMenDoc(
+          await FirestoreService(uid: user.uid,phoneNo: user.phoneNo).updateServiceMenDoc(
               uid: user.uid,
               name: _name,
               phoneNo: user.phoneNo,
