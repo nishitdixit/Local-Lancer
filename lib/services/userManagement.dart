@@ -4,6 +4,7 @@ import 'package:WorkListing/screens/logInScreen.dart';
 import 'package:WorkListing/screens/serviceMenHomeScreen.dart';
 import 'package:WorkListing/screens/askRegistrationScreen.dart';
 import 'package:WorkListing/services/firestoreService.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -52,7 +53,7 @@ class _RoleBasedRouteState extends State<RoleBasedRoute> {
       print(localUserData.role);
       if (localUserData.role == 'customer') {
         print('customer if block');
-        return CustomerHomeScreen();
+        return CustomerHomeScreen(localUserData:localUserData);
       } else {
         print('servicemen else block');
         return ServiceMenHomeScreen(localUserData:localUserData);
@@ -63,4 +64,6 @@ class _RoleBasedRouteState extends State<RoleBasedRoute> {
     // final LocalUserData localUserData = Provider.of<LocalUserData>(context);
    
   }
+
+
 }

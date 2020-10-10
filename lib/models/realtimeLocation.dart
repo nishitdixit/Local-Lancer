@@ -16,7 +16,7 @@ class RealtimeLocation {
       'name': localUserData.name,
       'phoneNo': localUserData.phoneNo,
       'profilePic': localUserData.profilePicUrl,
-      'geoHash':Geohash.encode(lat, long),
+      'geoHash':Geohash.encode(latitude:lat,longitude: long,codeLength:12),
       'lat': lat,
       'long': long,
     };

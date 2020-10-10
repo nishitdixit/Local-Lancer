@@ -3,15 +3,18 @@ import 'package:WorkListing/models/userLocation.dart';
 import 'package:WorkListing/screens/logInScreen.dart';
 import 'package:WorkListing/screens/serviceMenHomeScreen.dart';
 import 'package:WorkListing/services/PhoneAuth.dart';
+import 'package:WorkListing/services/firestoreService.dart';
 import 'package:WorkListing/services/location.dart';
 import 'package:WorkListing/services/userManagement.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(systemNavigationBarIconBrightness: Brightness.dark,systemNavigationBarColor: Colors.white,statusBarColor: Colors.white,statusBarIconBrightness: Brightness.dark));
   runApp(MyApp());
 }
 
@@ -27,13 +30,17 @@ class MyApp extends StatelessWidget {
             value: PhoneAuth().currentUserFromAuthMappedIntoLocalUser),
         // StreamProvider<UserLocation>.value(
             // value: LocationService().locationStream),
-        // StreamProvider<LocalUserData>.value(value: FirestoreService().userData),
+        // StreamProvider<LocalUserData>.value(value: FirestoreService().currentUserDocFromDBMappedIntoLocalUserData),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.orange,
+          // accentTextTheme: TextTheme().,
+          
+          // fontFamily: 'Oxygen',
+          // accentColor: Colors.black,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home: UserManagement(),
