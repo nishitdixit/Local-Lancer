@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:WorkListing/components/components.dart';
 import 'package:WorkListing/models/localUser.dart';
+import 'package:WorkListing/services/firebaseStorageService.dart';
 import 'package:WorkListing/services/firestoreService.dart';
 import 'package:WorkListing/widgets/bottomSheet.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +18,24 @@ class CustomerRegistration extends StatefulWidget {
 }
 
 class _CustomerRegistrationState extends State<CustomerRegistration> {
+  GlobalKey<FormState> _formKey=GlobalKey<FormState>();
   PickedFile _profilePic;
   String _name;
   String _address;
   String _gender;
+  Uint8List defaultProfileImageData;
+  FirebaseStorageService storage = FirebaseStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    storage
+        .getSystemImageByName(imageName: 'defaultProfilePic')
+        .then((value) => setState(() {
+              defaultProfileImageData = value;
+            }));
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<LocalUser>(context);
@@ -29,21 +45,23 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
       body: Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(top: heightPiece / 2),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              circularProfilePicWithEditOption(widthPiece, context),
-              // customStackForShowingCircularProfilePic(user, context),
-              SizedBox(height: 20),
-              customTextFieldForName(widthPiece),
-              SizedBox(height: 20),
-              customTextFieldForAddress(widthPiece),
-              SizedBox(height: 20),
-              customTextFieldForAadhar(widthPiece),
-              SizedBox(height: 20),
-              customButtonToUpdateCustomerDocInDatabase(
-                  widthPiece, user, context),
-            ],
+          child: Form(key: _formKey, 
+                      child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                circularProfilePicWithEditOption(widthPiece, context),
+                // customStackForShowingCircularProfilePic(user, context),
+                SizedBox(height: 20),
+                customTextFieldForName(widthPiece),
+                SizedBox(height: 20),
+                customTextFieldForAddress(widthPiece),
+                SizedBox(height: 20),
+                customTextFieldForAadhar(widthPiece),
+                SizedBox(height: 20),
+                customButtonToUpdateCustomerDocInDatabase(
+                    widthPiece, user, context),
+              ],
+            ),
           ),
         ),
       ),
@@ -100,10 +118,11 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
                     File(_profilePic.path),
                     fit: BoxFit.fill,
                   )
-                : Image.network(
-                    'https://firebasestorage.googleapis.com/v0/b/worklisting-61803.appspot.com/o/_DefaultImage%2Fblank_profile_pic.png?alt=media&token=da531832-6edc-4a1a-b9d8-4472d686b425',
-                    fit: BoxFit.fill,
-                  ),
+                :(defaultProfileImageData==null)?CircularProgressIndicator():Image.memory(defaultProfileImageData,fit: BoxFit.fill,),
+                //  Image.network(
+                //     'https://firebasestorage.googleapis.com/v0/b/worklisting-61803.appspot.com/o/_DefaultImage%2Fblank_profile_pic.png?alt=media&token=da531832-6edc-4a1a-b9d8-4472d686b425',
+                //     fit: BoxFit.fill,
+                //   ),
           ),
         ),
       ),
@@ -118,6 +137,7 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
         padding: const EdgeInsets.only(bottom: 6.0, top: 8.0),
         color: Colors.white,
         onPressed: () async {
+          _formKey.currentState.save();
           String fileName = basename(_profilePic.path);
           firebase_storage.StorageReference firebaseStorageRef =
               firebase_storage.FirebaseStorage.instance
@@ -138,13 +158,14 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
           //     .ref()
           //     .child('${user.uid}/$fileName')
           //     .getDownloadURL();
-          await FirestoreService(uid: user.uid,phoneNo: user.phoneNo).updateCustomerDoc(
-              uid: user.uid,
-              name: _name,
-              profilePicUrl: profilePicUrl,
-              phoneNo: user.phoneNo,
-              address: _address,
-              gender: _gender);
+          await FirestoreService(uid: user.uid, phoneNo: user.phoneNo)
+              .updateCustomerDoc(
+                  uid: user.uid,
+                  name: _name,
+                  profilePicUrl: profilePicUrl,
+                  phoneNo: user.phoneNo,
+                  address: _address,
+                  gender: _gender);
           Navigator.of(context).pop();
         },
         child: Text(
@@ -161,31 +182,30 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
   Padding customTextFieldForAadhar(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextField(
-          'Enter Aadhar Card Number',
-          TextInputType.phone,
+        child: customTextFormField(labelText:
+          'Gender',inputType:
+          TextInputType.number,onsaved:
           ((value) {
             _gender = value;
-          }),
-          Icon(Icons.credit_card_outlined),
+          }),prefixIcon:
+          Icon(Icons.person_pin_circle_outlined),validate:null,
         ));
   }
 
   Padding customTextFieldForAddress(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextField(
-            'Enter your address', TextInputType.streetAddress, ((value) {
+        child: customTextFormField(labelText:
+            'Enter your address', inputType:TextInputType.streetAddress,onsaved: ((value) {
           _address = value;
-        }), Icon(Icons.location_city)));
+        }), prefixIcon:Icon(Icons.location_city),validate: null,));
   }
 
   Padding customTextFieldForName(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child:
-            customTextField('Enter Full Name', TextInputType.phone, ((value) {
+        child: customTextFormField(labelText:'Enter Full Name', inputType:TextInputType.name,onsaved: ((value) {
           _name = value;
-        }), Icon(Icons.phone)));
+        }), prefixIcon:Icon(Icons.phone),validate:null, ));
   }
 }

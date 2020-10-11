@@ -1,15 +1,13 @@
 import 'package:WorkListing/models/localUser.dart';
 import 'package:WorkListing/models/userLocation.dart';
-import 'package:WorkListing/services/firestoreService.dart';
+import 'package:WorkListing/screens/serviceMenDetailPage.dart';
 import 'package:WorkListing/services/geoHash.dart';
 import 'package:WorkListing/services/location.dart';
-import 'package:WorkListing/services/userManagement.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:provider/provider.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   LocalUserData localUserData;
@@ -64,12 +62,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Container(
       // decoration: BoxDecoration(borderRadius: BorderRadius.circular(50)),
       child: Card(
+        
         shape: BeveledRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
         elevation: 5.0,
         color: Colors.white,
         child: ListTile(
+          onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ServiceMenDetailsPage(phoneNo: serviceMenLocation['phoneNo'],)));},
           leading: CircleAvatar(
             backgroundImage: NetworkImage(serviceMenLocation['profilePic']),
           ),

@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 
-ClipPath backgroundClip(double heightPiece, double widthPiece) {
-  return ClipPath(
-      clipper: OrangeClipper(),
-      child: Container(
-        color: Color(0xffF57921),
-        height: heightPiece * 10,
-        width: widthPiece * 10,
-      ));
-}
-
-TextField customTextField( String hintText, TextInputType inputType,Function onChanged,Widget prefixIcon) {
-  return TextField(onChanged: onChanged,
+TextFormField customTextFormField({String labelText, TextInputType inputType,
+    Function onsaved, Widget prefixIcon,String Function(String) validate}) {
+  return TextFormField(validator: validate,
+    onSaved: onsaved,
     keyboardType: inputType,
-    decoration: InputDecoration(prefixIcon: prefixIcon,
+    decoration: InputDecoration(
+      prefixIcon: prefixIcon,
       border: InputBorder.none,
-      hintText: hintText,
+      labelText: labelText,
       filled: true,
       fillColor: Colors.grey[200],
       contentPadding: const EdgeInsets.only(left: 14.0, bottom: 6.0, top: 8.0),
@@ -31,29 +24,18 @@ TextField customTextField( String hintText, TextInputType inputType,Function onC
   );
 }
 
-class OrangeClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var widthPiece = size.width / 10;
-    var heightPiece = size.height / 10;
-    Path path = Path();
-    path.lineTo(0, 0);
-    path.lineTo(0, heightPiece *9);
-    path.arcToPoint(Offset(widthPiece * 3, heightPiece * 6));
-    path.quadraticBezierTo((widthPiece*4), (heightPiece*5),(widthPiece*4.5), (heightPiece*5.3));
-    path.arcToPoint(Offset(widthPiece * 5.5, heightPiece * 6.2));
-
-    path.quadraticBezierTo(((widthPiece*6.4)), ((heightPiece*7.2)),((widthPiece*7.5)), ((heightPiece*6)));
-
-    // path.arcToPoint(Offset(widthPiece * 6, heightPiece * 6));
-    path.lineTo(size.width, heightPiece * 3);
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return true;
-  }
+RaisedButton customButton({void Function() onPressed,String buttonText}) {
+  return RaisedButton(
+    padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 10.0),
+    color: Colors.white,
+    onPressed: onPressed,
+    child: Text(
+      '$buttonText',
+      style: TextStyle(color: Colors.orange,fontSize: 20),
+    ),
+    shape: RoundedRectangleBorder(
+        borderRadius: new BorderRadius.circular(18.0),
+        side: BorderSide(color: Colors.white)),
+  );
 }
+

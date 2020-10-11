@@ -10,6 +10,12 @@ class FirestoreService {
   final CollectionReference userDataCollectionRefrence =
       FirebaseFirestore.instance.collection('users');
 
+
+  //get details of service mens by their phone no. mapped into localuser data
+  Future<LocalUserData> getServiceMenDetailsByPhoneNo(String phoneNo){
+    return userDataCollectionRefrence.doc(phoneNo).get().then((snapshot) => _localUserDataFromSnapshot(snapshot));
+  }
+
   //update customer doc
   Future updateCustomerDoc({
     String uid,
@@ -88,6 +94,9 @@ class FirestoreService {
     } else
       return null;
   }
+
+
+
 
   // get currentUserDataFromDB stream
   Stream<LocalUserData> get currentUserDocFromDBMappedIntoLocalUserData {

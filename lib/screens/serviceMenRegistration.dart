@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:WorkListing/components/components.dart';
 import 'package:WorkListing/models/localUser.dart';
+import 'package:WorkListing/services/firebaseStorageService.dart';
 import 'package:WorkListing/services/firestoreService.dart';
 import 'package:WorkListing/widgets/bottomSheet.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,8 @@ class ServiceMenRegistration extends StatefulWidget {
 
 class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
   PickedFile _profilePic;
+  Uint8List defaultProfileImageData;
+  FirebaseStorageService storage = FirebaseStorageService();
   String _name;
   String _aadharNo;
   String _age;
@@ -24,6 +28,17 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
   String _experience;
   String _gender;
   String _skill;
+
+  @override
+  void initState() {
+    super.initState();
+    storage
+        .getSystemImageByName(imageName: 'defaultProfilePic')
+        .then((value) => setState(() {
+              defaultProfileImageData = value;
+            }));
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<LocalUser>(context);
@@ -87,17 +102,18 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
           } catch (e) {
             print(e);
           }
-          await FirestoreService(uid: user.uid,phoneNo: user.phoneNo).updateServiceMenDoc(
-              uid: user.uid,
-              name: _name,
-              phoneNo: user.phoneNo,
-              address: _address,
-              gender: _gender,
-              experience: _experience,
-              profilePicUrl: profilePicUrl,
-              age: _age,
-              skill: _skill,
-              aadharNo: _aadharNo);
+          await FirestoreService(uid: user.uid, phoneNo: user.phoneNo)
+              .updateServiceMenDoc(
+                  uid: user.uid,
+                  name: _name,
+                  phoneNo: user.phoneNo,
+                  address: _address,
+                  gender: _gender,
+                  experience: _experience,
+                  profilePicUrl: profilePicUrl,
+                  age: _age,
+                  skill: _skill,
+                  aadharNo: _aadharNo);
           Navigator.of(context).pop();
         },
         child: Text(
@@ -114,36 +130,36 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
   Padding fieldForGender(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextField('Enter gender', TextInputType.text, ((value) {
+        child: customTextFormField(labelText:'Enter gender',inputType :TextInputType.text, onsaved:((value) {
           _gender = value;
-        }), Icon(Icons.person_pin_circle_outlined)));
+        }), prefixIcon:Icon(Icons.person_pin_circle_outlined),validate: null,));
   }
 
   Padding customTextFieldForExperiance(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextField(
-            'Enter experience in years', TextInputType.number, ((value) {
+        child: customTextFormField(labelText:
+            'Enter experience in years', inputType:TextInputType.number,onsaved: ((value) {
           _experience = value;
-        }), Icon(Icons.timeline)));
+        }), prefixIcon:Icon(Icons.timeline),validate: null));
   }
 
   Padding customTextFieldForAadhar(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextField('Enter Aadhar Card Number', TextInputType.phone,
-            ((value) {
+        child: customTextFormField(labelText:'Enter Aadhar Card Number', inputType:TextInputType.phone,
+            onsaved:((value) {
           _aadharNo = value;
-        }), Icon(Icons.credit_card_outlined)));
+        }), prefixIcon:Icon(Icons.credit_card_outlined),validate: null,));
   }
 
   Padding customTextFieldForAddress(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextField(
-            'Enter your address', TextInputType.streetAddress, ((value) {
+        child: customTextFormField(
+            labelText:'Enter your address', inputType:TextInputType.streetAddress, onsaved:((value) {
           _address = value;
-        }), Icon(Icons.location_city)));
+        }), prefixIcon:Icon(Icons.location_city),validate: null,));
   }
 
   Row circularProfilePicWithEditOption(
@@ -166,10 +182,16 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
                         File(_profilePic.path),
                         fit: BoxFit.fill,
                       )
-                    : Image.network(
-                        'https://firebasestorage.googleapis.com/v0/b/worklisting-61803.appspot.com/o/_DefaultImage%2Fblank_profile_pic.png?alt=media&token=da531832-6edc-4a1a-b9d8-4472d686b425',
-                        fit: BoxFit.fill,
-                      ),
+                    : (defaultProfileImageData == null)
+                        ? CircularProgressIndicator()
+                        : Image.memory(
+                            defaultProfileImageData,
+                            fit: BoxFit.fill,
+                          ),
+                // Image.network(
+                //     'https://firebasestorage.googleapis.com/v0/b/worklisting-61803.appspot.com/o/_DefaultImage%2Fblank_profile_pic.png?alt=media&token=da531832-6edc-4a1a-b9d8-4472d686b425',
+                //     fit: BoxFit.fill,
+                //   ),
               ),
             ),
           ),
@@ -202,25 +224,25 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
         child:
-            customTextField('Enter your skill', TextInputType.text, ((value) {
+            customTextFormField(labelText:'Enter your skill', inputType:TextInputType.text, onsaved:((value) {
           _skill = value;
-        }), Icon(Icons.work)));
+        }), prefixIcon:Icon(Icons.work),validate: null,));
   }
 
   Padding customTextFIeldForAge(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
         child:
-            customTextField('Enter your age', TextInputType.number, ((value) {
+            customTextFormField(labelText:'Enter your age', inputType:TextInputType.number, onsaved:((value) {
           _age = value;
-        }), Icon(Icons.location_city)));
+        }),prefixIcon: Icon(Icons.location_city),validate: null,));
   }
 
   Padding customTextFIeldForName(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextField('Enter Full Name', TextInputType.name, ((value) {
+        child: customTextFormField(labelText:'Enter Full Name', inputType:TextInputType.name, onsaved:((value) {
           _name = value;
-        }), Icon(Icons.person)));
+        }), prefixIcon:Icon(Icons.person),validate: null,));
   }
 }

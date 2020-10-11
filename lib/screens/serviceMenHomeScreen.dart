@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:WorkListing/components/components.dart';
 import 'package:WorkListing/models/localUser.dart';
 import 'package:WorkListing/models/realtimeLocation.dart';
 import 'package:WorkListing/models/userLocation.dart';
@@ -17,33 +16,52 @@ class ServiceMenHomeScreen extends StatefulWidget {
 }
 
 class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
-  StreamSubscription<UserLocation> locationSS;
   FirebaseAuth _auth = FirebaseAuth.instance;
-  LocalUserData currentUser;
   bool trackingPermission = false;
+     StreamSubscription<UserLocation> locationSS;
+  LocalUserData currentUser;
   Map currentLocationWithUserDetails;
 
-  updateRealtimeLocation(UserLocation userLocation) {
+
+  updateRealtimeLocation(UserLocation userChangedLocation) {
     currentLocationWithUserDetails = RealtimeLocation(
-            lat: userLocation.latitude, long: userLocation.longitude)
-        .toMap(widget.localUserData);
+            lat: userChangedLocation.latitude, long: userChangedLocation.longitude)
+        .toMap(currentUser);
+        print(currentLocationWithUserDetails['geoHash']);
     RealtimeDatabaseService(currentLocationData: currentLocationWithUserDetails)
         .updateLocation();
   }
 
   locationSubscription() {
     locationSS = LocationService().locationStream;
-    locationSS.onData((userChangedLocation) {
-      updateRealtimeLocation(userChangedLocation);
-    });
+    if (currentUser.name != null)
+      locationSS.onData((userChangedLocation) {
+        updateRealtimeLocation(userChangedLocation);
+      });
   }
+
+
+
 
   @override
   void initState() {
     super.initState();
     RealtimeLocation(phoneNo: _auth.currentUser.phoneNumber);
-    locationSubscription();
     currentUser = widget.localUserData;
+    locationSubscription();
+   
+
+    
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (locationSS.isPaused||currentUser.name == null)
+    {
+      locationSS.cancel();
+    }
+    
   }
 
   @override
@@ -62,7 +80,7 @@ class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
                   (locationSS.isPaused)
                       ? locationSS.resume()
                       : locationSS.pause();
-                  trackingPermission = locationPermission;
+                  // trackingPermission = locationPermission;
                 });
               })
         ],
@@ -74,16 +92,18 @@ class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
             Flexible(
                 child: Image(
                     height: heightPiece * 4,
-                    image: (trackingPermission)
+                    image: (!locationSS.isPaused)
                         ? AssetImage('assets/images/happyEmoji.png')
                         : AssetImage('assets/images/sadEmoji.png'))),
             SizedBox(
               height: heightPiece / 2,
             ),
-            Text((trackingPermission)
-                ? 'You are visible to other people,\n just sit back and relax,\n you may get calls for work......'
-                : 'You turned off your visibility,\n no one can find you for work.....'
-                ,style: TextStyle(fontFamily: 'Oxygen',fontSize: heightPiece/3)),
+            Text(
+                (!locationSS.isPaused)
+                    ? 'You are visible to other people,\n just sit back and relax,\n you may get calls for work......'
+                    : 'You turned off your visibility,\n no one can find you for work.....',
+                style:
+                    TextStyle(fontFamily: 'Oxygen', fontSize: heightPiece / 4)),
             // Text('Data from location Subscription'),
             // RaisedButton(
             //   child: Text('Logout'),
