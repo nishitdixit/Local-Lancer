@@ -12,7 +12,12 @@ import 'package:provider/provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 
+class ListItem {
+  int value;
+  String name;
 
+  ListItem(this.value, this.name);
+}
 
 class CustomerRegistration extends StatefulWidget {
   @override
@@ -30,10 +35,34 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
   FirebaseStorageService storage = FirebaseStorageService();
   FocusNode _blankFocusNode = FocusNode();
 
+  List<ListItem> _dropdownItems = [
+    ListItem(1, "Male"),
+    ListItem(2, "Female"),
+    ListItem(3, "other"),
+  ];
+
+  List<DropdownMenuItem<ListItem>> _dropdownMenuItems;
+  ListItem _selectedItem;
+
+  List<DropdownMenuItem<ListItem>> buildDropDownMenuItems(List listItems) {
+    List<DropdownMenuItem<ListItem>> items = List();
+    for (ListItem listItem in listItems) {
+      items.add(
+        DropdownMenuItem(
+          child: Text(listItem.name),
+          value: listItem,
+        ),
+      );
+    }
+    return items;
+  }
 
   @override
   void initState() {
     super.initState();
+    _dropdownMenuItems = buildDropDownMenuItems(_dropdownItems);
+    _selectedItem = _dropdownMenuItems[0].value;
+    _gender = _selectedItem.name;
     storage
         .getSystemImageByName(imageName: 'defaultProfilePic')
         .then((value) => setState(() {
@@ -71,7 +100,10 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
                 children: <Widget>[
                   circularProfilePicWithEditOption(widthPiece, context),
                   (imageError == true)
-                      ? Text('Please Upload Image',style: TextStyle(color:Colors.red),)
+                      ? Text(
+                          'Please Upload Image',
+                          style: TextStyle(color: Colors.red),
+                        )
                       : Container(),
 
                   // customStackForShowingCircularProfilePic(user, context),
@@ -219,16 +251,25 @@ class _CustomerRegistrationState extends State<CustomerRegistration> {
 
   Padding customTextFieldForAadhar(double widthPiece) {
     return Padding(
-        padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextFormField(
-          labelText: 'Gender',
-          inputType: TextInputType.number,
-          onsaved: ((value) {
-            _gender = value;
-          }),
-          prefixIcon: Icon(Icons.person_pin_circle_outlined),
-          validate: null,
-        ));
+      padding: EdgeInsets.symmetric(horizontal: widthPiece),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text('Gender :'),
+          DropdownButton<ListItem>(
+              elevation: 25,
+              dropdownColor: Colors.grey,
+              value: _selectedItem,
+              items: _dropdownMenuItems,
+              onChanged: (value) {
+                setState(() {
+                  _selectedItem = value;
+                  _gender = value.name;
+                });
+              }),
+        ],
+      ),
+    );
   }
 
   Padding customTextFieldForAddress(double widthPiece) {
