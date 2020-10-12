@@ -12,11 +12,12 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
-    GlobalKey<FormState> _formKey=GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String phoneNo;
   Uint8List logoImageData;
   FirebaseStorageService storage = FirebaseStorageService();
+  FocusNode _blankFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -34,38 +35,60 @@ class _LogInScreenState extends State<LogInScreen> {
     var widthPiece = MediaQuery.of(context).size.width / 10;
     return Scaffold(
       // backgroundColor: Color(0xffF57921),
-      body: Form(key: _formKey, 
-              child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Flexible(
-              child: Container(
-                height: heightPiece * 5,
-                width: widthPiece * 8,
-                child: (logoImageData == null)
-                    ? CircularProgressIndicator()
-                    : Image.memory(logoImageData, fit: BoxFit.fitWidth),
-                // Image.network(
-                //     'https://firebasestorage.googleapis.com/v0/b/worklisting-61803.appspot.com/o/_DefaultImage%2FPngItem_5922090.png?alt=media&token=696c1cf9-c12f-4ec7-a12f-2bdedf727e39',
-                //     fit: BoxFit.fitWidth),
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          FocusScope.of(context).requestFocus(_blankFocusNode);
+        },
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Container(
+                  height: heightPiece * 5,
+                  width: widthPiece * 8,
+                  child: (logoImageData == null)
+                      ? CircularProgressIndicator()
+                      : Image.memory(logoImageData, fit: BoxFit.fitWidth),
+                  // Image.network(
+                  //     'https://firebasestorage.googleapis.com/v0/b/worklisting-61803.appspot.com/o/_DefaultImage%2FPngItem_5922090.png?alt=media&token=696c1cf9-c12f-4ec7-a12f-2bdedf727e39',
+                  //     fit: BoxFit.fitWidth),
+                ),
               ),
-            ),
-            Padding(
+              Padding(
+                  padding: EdgeInsets.symmetric(horizontal: widthPiece),
+                  child: customTextFormField(
+                      labelText: 'Enter 10 digit mobile no.',
+                      inputType: TextInputType.phone,
+                      onsaved: ((value) {
+                        phoneNo = '+91' + value;
+                      }),
+                      prefixIcon: Icon(Icons.phone),
+                      validate: (value) {
+                        if (value.length < 10 || value.length > 10) {
+                          return "Invalid";
+                        } else {
+                          print(value.length);
+                          _formKey.currentState.save();
+                          return null;
+                        }
+                      })),
+              SizedBox(
+                height: 20,
+              ),
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: widthPiece),
-                child: customTextFormField(
-                   labelText: 'Enter 10 digit mobile no.', inputType:TextInputType.phone, onsaved:((value) {
-                  phoneNo = '+91' + value;
-                }), prefixIcon:Icon(Icons.phone),validate: null)),
-            SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: widthPiece),
-              child: customButton(buttonText: 'Send OTP',onPressed: () {_formKey.currentState.save();
-                PhoneAuth().verifyPhone(context, phoneNo);
-              }),
-            ),
-          ],
+                child: customButton(
+                    buttonText: 'Send OTP',
+                    onPressed: () {
+                      _formKey.currentState.validate();
+                      PhoneAuth().verifyPhone(context, phoneNo);
+                    }),
+              ),
+            ],
+          ),
         ),
       ),
     );

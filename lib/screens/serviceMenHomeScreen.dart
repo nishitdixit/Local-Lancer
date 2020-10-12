@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:WorkListing/models/localUser.dart';
 import 'package:WorkListing/models/realtimeLocation.dart';
 import 'package:WorkListing/models/userLocation.dart';
 import 'package:WorkListing/services/RealtimeDatabaseService.dart';
+import 'package:WorkListing/services/firebaseStorageService.dart';
 import 'package:WorkListing/services/location.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,16 +20,19 @@ class ServiceMenHomeScreen extends StatefulWidget {
 class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   bool trackingPermission = false;
-     StreamSubscription<UserLocation> locationSS;
+  StreamSubscription<UserLocation> locationSS;
   LocalUserData currentUser;
   Map currentLocationWithUserDetails;
-
+  Uint8List happyImageData;
+  Uint8List sadImageData;
+  FirebaseStorageService storage = FirebaseStorageService();
 
   updateRealtimeLocation(UserLocation userChangedLocation) {
     currentLocationWithUserDetails = RealtimeLocation(
-            lat: userChangedLocation.latitude, long: userChangedLocation.longitude)
+            lat: userChangedLocation.latitude,
+            long: userChangedLocation.longitude)
         .toMap(currentUser);
-        print(currentLocationWithUserDetails['geoHash']);
+    print(currentLocationWithUserDetails['geoHash']);
     RealtimeDatabaseService(currentLocationData: currentLocationWithUserDetails)
         .updateLocation();
   }
@@ -40,28 +45,30 @@ class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
       });
   }
 
-
-
-
   @override
   void initState() {
     super.initState();
     RealtimeLocation(phoneNo: _auth.currentUser.phoneNumber);
     currentUser = widget.localUserData;
     locationSubscription();
-   
-
-    
+    storage
+        .getSystemImageByName(imageName: 'happyEmoji')
+        .then((value) => setState(() {
+              sadImageData = value;
+            }));
+    storage
+        .getSystemImageByName(imageName: 'sadEmoji')
+        .then((value) => setState(() {
+              happyImageData = value;
+            }));
   }
 
   @override
   void dispose() {
     super.dispose();
-    if (locationSS.isPaused||currentUser.name == null)
-    {
+    if (locationSS.isPaused || currentUser.name == null) {
       locationSS.cancel();
     }
-    
   }
 
   @override
@@ -90,11 +97,16 @@ class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
-                child: Image(
-                    height: heightPiece * 4,
-                    image: (!locationSS.isPaused)
-                        ? AssetImage('assets/images/happyEmoji.png')
-                        : AssetImage('assets/images/sadEmoji.png'))),
+                child: (happyImageData == null && sadImageData == null)
+                    ? Padding(
+                        padding: const EdgeInsets.all(30.0),
+                        child: CircularProgressIndicator(),
+                      )
+                    : (!locationSS.isPaused)
+                        ? Image.memory(happyImageData,
+                            height: heightPiece * 4, fit: BoxFit.fitWidth)
+                        : Image.memory(sadImageData,
+                            height: heightPiece * 4, fit: BoxFit.fitWidth)),
             SizedBox(
               height: heightPiece / 2,
             ),

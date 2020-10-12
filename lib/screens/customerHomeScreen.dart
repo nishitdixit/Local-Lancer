@@ -138,7 +138,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     children: [
                       Expanded(
                         child: Center(
-                          child: CircleAvatar(
+                          child: (currentUser.profilePicUrl==null)?Text('No Image Available',style: TextStyle(color: Colors.grey,fontFamily: 'Oxygen',fontSize: 20),):CircleAvatar(
                             backgroundImage:
                                 NetworkImage(currentUser.profilePicUrl),
                             maxRadius: widthPiece*2,
