@@ -54,12 +54,12 @@ class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
     storage
         .getSystemImageByName(imageName: 'happyEmoji')
         .then((value) => setState(() {
-              sadImageData = value;
+              happyImageData = value;
             }));
     storage
         .getSystemImageByName(imageName: 'sadEmoji')
         .then((value) => setState(() {
-              happyImageData = value;
+              sadImageData = value;
             }));
   }
 

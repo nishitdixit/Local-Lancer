@@ -38,7 +38,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     await getLocation().then((value) => currentLocationQuery =
             FirebaseDatabase.instance.reference().child('serviceMen')
         .orderByChild("geoHash")
-        .startAt(geoHash)
+        // .equalTo(geoHash)
+        .startAt(geoHash).endAt('$geoHash\uf8ff')
         );
     setState(() {
       isQueryReady = true;
@@ -47,7 +48,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Future<void> getLocation() async {
     userLocation = await locationService.getLocation();
-    geoHash = Geohash.encode(latitude:userLocation.latitude,longitude: userLocation.longitude,codeLength:6 );
+    geoHash = Geohash.encode(latitude:userLocation.latitude,longitude: userLocation.longitude,codeLength:3);
     print(geoHash);
     print(userLocation.latitude);
     print(userLocation.longitude);
@@ -76,16 +77,23 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           title: Text(
             serviceMenLocation['name'],
             style: TextStyle(
-                fontWeight: FontWeight.w700, fontSize: 20, letterSpacing: 1),
+                fontWeight: FontWeight.w700, fontSize: 20, letterSpacing: 1,fontFamily: 'Oxygen'),
           ),
           subtitle: Text(
             serviceMenLocation['phoneNo'],
             style: TextStyle(
                 fontWeight: FontWeight.w500, fontSize: 15, letterSpacing: 1),
           ),
-          trailing: Text(
-            '${distance.truncate()} KMs away',
-            style: TextStyle(),
+          trailing: Column(crossAxisAlignment: CrossAxisAlignment.end,mainAxisAlignment:MainAxisAlignment.spaceEvenly ,
+            children: [
+              Text(
+                serviceMenLocation['skill'],
+                style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Oxygen'),),
+              Text(
+                '${distance.truncate()} KMs away',
+                style: TextStyle(),
+              ),
+            ],
           ),
         ),
       ),
