@@ -87,6 +87,7 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
     super.initState();
     _dropdownMenuItems = buildDropDownMenuItems(_dropdownItems);
     _selectedItem = _dropdownMenuItems[0].value;
+    _gender=_selectedItem.name;
     storage
         .getSystemImageByName(imageName: 'defaultProfilePic')
         .then((value) => setState(() {
