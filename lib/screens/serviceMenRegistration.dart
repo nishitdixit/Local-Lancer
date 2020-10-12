@@ -157,6 +157,7 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
         padding: const EdgeInsets.only(bottom: 6.0, top: 8.0),
         color: Colors.white,
         onPressed: () async {
+          _formKey.currentState.validate();
           var profilePicUrl;
           if (_profilePic != null) {
             String fileName = basename(_profilePic.path);
@@ -343,7 +344,7 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
             _skill = value;
           }),
           prefixIcon: Icon(Icons.work),
-          validate: null,
+          validate: requiredValidator,
         ));
   }
 
@@ -356,8 +357,8 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
           onsaved: ((value) {
             _age = value;
           }),
-          prefixIcon: Icon(Icons.location_city),
-          validate: null,
+          prefixIcon: Icon(Icons.hourglass_top_outlined),
+          validate:requiredValidator,
         ));
   }
 
@@ -371,7 +372,7 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
             _name = value;
           }),
           prefixIcon: Icon(Icons.person),
-          validate: null,
+          validate: requiredValidator,
         ));
   }
 }
