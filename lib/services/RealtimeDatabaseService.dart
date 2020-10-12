@@ -1,6 +1,6 @@
-import 'package:WorkListing/services/firestoreService.dart';
-import 'package:WorkListing/services/location.dart';
+
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 
 class RealtimeDatabaseService{
   String nodeName = "skill1";
@@ -13,9 +13,8 @@ class RealtimeDatabaseService{
     database.reference().child('serviceMen/${currentLocationData['phoneNo']}').set(currentLocationData);
   }
 
-
-  // var currentUser=FirestoreService().currentUserDocFromDBMappedIntoLocalUserData;
-  // var locationSS= LocationService().locationStream.onData((data) {print(data.latitude); print(data.longitude);});
-
+deleteLocation({@required String phoneNo}){
+  database.reference().child('serviceMen/$phoneNo').remove();
+}
 
 }

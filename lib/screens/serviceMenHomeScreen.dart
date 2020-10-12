@@ -180,6 +180,7 @@ class _ServiceMenHomeScreenState extends State<ServiceMenHomeScreen> {
           FlatButton(
               onPressed: () {
                 locationSS.cancel();
+                RealtimeDatabaseService().deleteLocation(phoneNo:currentUser.phoneNo);
                 _auth.signOut();
               },
               child: Row(
