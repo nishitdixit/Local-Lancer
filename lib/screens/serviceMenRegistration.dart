@@ -5,6 +5,7 @@ import 'package:WorkListing/models/localUser.dart';
 import 'package:WorkListing/services/firebaseStorageService.dart';
 import 'package:WorkListing/services/firestoreService.dart';
 import 'package:WorkListing/widgets/bottomSheet.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,6 +31,8 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
   PickedFile _profilePic;
   Uint8List defaultProfileImageData;
   FirebaseStorageService storage = FirebaseStorageService();
+  CollectionReference defaultCollectionReference =
+      FirebaseFirestore.instance.collection('default');
   FocusNode _blankFocusNode = FocusNode();
 
   String _name;
@@ -40,6 +43,7 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
   String _gender;
   String _skill;
   bool imageError = false;
+  bool skillError = false;
 
   List<ListItem> _dropdownItems = [
     ListItem(1, "Male"),
@@ -47,10 +51,31 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
     ListItem(3, "other"),
   ];
 
-  List<DropdownMenuItem<ListItem>> _dropdownMenuItems;
-  ListItem _selectedItem;
+  List<DropdownMenuItem<ListItem>> _genderDropdownMenuItems;
+  List<DropdownMenuItem<ListItem>> _skillDropdownMenuItems=[];
+  ListItem _selectedGender;
+  ListItem _selectedSkill;
+  List skillList;
 
-  List<DropdownMenuItem<ListItem>> buildDropDownMenuItems(List listItems) {
+  Future<List<String>> _buildSkillList() async {      print(skillList);
+
+    await defaultCollectionReference.doc('skills').get().then((value) {
+      skillList = value.data()['skill'];
+      print(skillList);
+       for (int i = 0; i < skillList.length; i++) {
+      _skillDropdownMenuItems.add(DropdownMenuItem(
+        child: Text(skillList[i]),
+        value: ListItem(i,skillList[i] ),
+      ));
+      print(skillList);
+    }
+    });
+   
+   
+  }
+
+  List<DropdownMenuItem<ListItem>> buildGenderDropDownMenuItems(
+      List listItems) {
     List<DropdownMenuItem<ListItem>> items = List();
     for (ListItem listItem in listItems) {
       items.add(
@@ -85,9 +110,10 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
   @override
   void initState() {
     super.initState();
-    _dropdownMenuItems = buildDropDownMenuItems(_dropdownItems);
-    _selectedItem = _dropdownMenuItems[0].value;
-    _gender=_selectedItem.name;
+    _genderDropdownMenuItems = buildGenderDropDownMenuItems(_dropdownItems);
+    _buildSkillList();
+    _selectedGender = _genderDropdownMenuItems[0].value;
+    _gender = _selectedGender.name;
     storage
         .getSystemImageByName(imageName: 'defaultProfilePic')
         .then((value) => setState(() {
@@ -128,13 +154,20 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
                   SizedBox(height: 20),
                   customTextFIeldForAge(widthPiece),
                   SizedBox(height: 20),
-                  customTextFieldForSkills(widthPiece),
-                  SizedBox(height: 20),
+                 
                   customTextFieldForAddress(widthPiece),
                   SizedBox(height: 20),
                   customTextFieldForAadhar(widthPiece),
                   SizedBox(height: 20),
                   customTextFieldForExperience(widthPiece),
+                  SizedBox(height: 20),
+                   customTextFieldForSkills(widthPiece),
+                  (skillError == true)
+                      ? Text(
+                          'Please choose Your Skill',
+                          style: TextStyle(color: Colors.red),
+                        )
+                      : Container(),
                   SizedBox(height: 20),
                   fieldForGender(widthPiece),
                   SizedBox(height: 20),
@@ -159,6 +192,12 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
         onPressed: () async {
           _formKey.currentState.validate();
           var profilePicUrl;
+          if (_skill == null) {
+            setState(() {
+              skillError = true;
+              return;
+            });
+          }
           if (_profilePic != null) {
             String fileName = basename(_profilePic.path);
             firebase_storage.StorageReference firebaseStorageRef =
@@ -210,15 +249,18 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
   Padding fieldForGender(double widthPiece) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: widthPiece),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Text('Gender :'),
-          DropdownButton<ListItem>(elevation: 25,dropdownColor: Colors.grey,
-              value: _selectedItem,
-              items: _dropdownMenuItems,
+          DropdownButton<ListItem>(
+              elevation: 25,
+              dropdownColor: Colors.grey,
+              value: _selectedGender,
+              items: _genderDropdownMenuItems,
               onChanged: (value) {
                 setState(() {
-                  _selectedItem = value;
+                  _selectedGender = value;
                   _gender = value.name;
                 });
               }),
@@ -337,15 +379,36 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
   Padding customTextFieldForSkills(double widthPiece) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: widthPiece),
-        child: customTextFormField(
-          labelText: 'Enter your skill',
-          inputType: TextInputType.text,
-          onsaved: ((value) {
-            _skill = value;
-          }),
-          prefixIcon: Icon(Icons.work),
-          validate: requiredValidator,
-        ));
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text('Skill :'),
+            DropdownButton(
+                items: _skillDropdownMenuItems,
+                elevation: 25,
+                dropdownColor: Colors.grey,
+                value: _selectedSkill,
+                hint: Text('Choose Skill'),
+                onChanged: (value) {
+                  print(value);
+                  setState(() {
+                    _selectedSkill = value;
+                    _skill = value.name;
+                  });
+                }),
+          ],
+        )
+
+        //  customTextFormField(
+        //   labelText: 'Enter your skill',
+        //   inputType: TextInputType.text,
+        //   onsaved: ((value) {
+        //     _skill = value;
+        //   }),
+        //   prefixIcon: Icon(Icons.work),
+        //   validate: requiredValidator,
+        // )
+        );
   }
 
   Padding customTextFIeldForAge(double widthPiece) {
@@ -358,7 +421,7 @@ class _ServiceMenRegistrationState extends State<ServiceMenRegistration> {
             _age = value;
           }),
           prefixIcon: Icon(Icons.hourglass_top_outlined),
-          validate:requiredValidator,
+          validate: requiredValidator,
         ));
   }
 
